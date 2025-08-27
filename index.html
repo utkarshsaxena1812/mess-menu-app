@@ -6,53 +6,141 @@
 <title>Mess Menu</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  /* … your existing styles … */
 
-  /* extra styles for new features */
-  .hamburger {
-    font-size: 1.5rem;
-    cursor: pointer;
-    background: none;
-    border: none;
+<style>
+  :root{
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #64748b;
+    --ring: rgba(59,130,246,.35);
+    --border: #e5e7eb;
+
+    --accent: linear-gradient(135deg,#7c3aed,#2563eb);
+    --accent2: linear-gradient(135deg,#22c55e,#14b8a6);
+    --accent3: linear-gradient(135deg,#f59e0b,#ef4444);
+    --accent4: linear-gradient(135deg,#06b6d4,#6366f1);
+
+    --chip-bg:#eef2ff;
+    --chip-text:#3730a3;
+  }
+  :root.dark{
+    --bg: #0b1220;
+    --card: #0f172a;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --ring: rgba(99,102,241,.45);
+    --border: #1f2937;
+
+    --chip-bg:#1f2540;
+    --chip-text:#a5b4fc;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: var(--bg);
     color: var(--text);
+    line-height:1.5;
   }
-  .sidebar {
-    position: fixed;
-    top: 0; left: -300px;
-    width: 280px; height: 100%;
+
+  .hero{
+    position: relative;
+    padding: 28px 20px 28px;
+    background: radial-gradient(1200px 380px at 10% -10%, rgba(99,102,241,.25), transparent),
+                radial-gradient(1200px 420px at 90% -20%, rgba(34,197,94,.18), transparent);
+    overflow:hidden;
+    border-bottom:1px solid var(--border);
+  }
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:920px;margin:0 auto;
+  }
+  .brand{
+    display:flex;align-items:center;gap:12px;
+  }
+  .logo{
+    width:40px;height:40px;border-radius:12px;
+    background: var(--accent);
+    box-shadow: 0 8px 24px rgba(79,70,229,.35);
+  }
+  .title{
+    font-weight:700;font-size:1.2rem;letter-spacing:.2px;
+  }
+
+  .toggle{
+    display:inline-flex;align-items:center;gap:10px;
     background: var(--card);
-    border-right: 1px solid var(--border);
-    box-shadow: 4px 0 12px rgba(0,0,0,.15);
-    padding: 20px;
-    transition: left .3s ease;
-    overflow-y: auto;
-    z-index: 1000;
+    border:1px solid var(--border);
+    padding:8px 12px;border-radius:999px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
   }
-  .sidebar.open { left: 0; }
-  .sidebar h2 { margin-top: 0; }
-  .offline-banner {
-    display: none;
-    background: #fee2e2;
-    color: #991b1b;
-    padding: 8px;
-    text-align: center;
-    font-size: .9rem;
+  .toggle button{
+    border:0; background:transparent; color:var(--muted); cursor:pointer;
+    width:34px; height:34px; border-radius:999px;
+    display:grid; place-items:center; font-size:18px;
+    transition:.15s transform ease;
   }
-  .footer {
-    text-align: center;
-    font-size: .8rem;
-    color: var(--muted);
-    padding: 20px;
+  .toggle button.active{
+    color:var(--text);
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
+
+  .wrap{max-width:920px;margin:28px auto 40px;padding:0 20px}
+  .grid{
+    display:grid;gap:16px;
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .card{
+    grid-column: span 12;
+    background: var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    position:relative;
+    overflow:hidden;
+  }
+  @media (min-width:700px){
+    .card{grid-column: span 6}
+  }
+  @media (min-width:1000px){
+    .card{grid-column: span 3}
+  }
+
+  .flag{
+    position:absolute; inset:0 auto auto 0; width:6px; height:100%;
+    background: var(--accent);
+  }
+  .flag.breakfast{ background: var(--accent) }
+  .flag.lunch{ background: var(--accent2) }
+  .flag.snacks{ background: var(--accent3) }
+  .flag.dinner{ background: var(--accent4) }
+
+  .card h3{
+    margin:0 0 8px; font-size:1.05rem;
+    display:flex;align-items:center;gap:8px;
+  }
+  .tag{
+    font-size:.75rem; font-weight:600; color:var(--muted);
+  }
+  .items{
+    margin-top:8px; color:var(--text);
+  }
+
+  .card{ transform: translateY(8px); opacity:0; animation:pop .35s ease forwards; }
+  .card:nth-child(1){animation-delay:.02s}
+  .card:nth-child(2){animation-delay:.07s}
+  .card:nth-child(3){animation-delay:.12s}
+  .card:nth-child(4){animation-delay:.17s}
+  @keyframes pop{to{transform:none;opacity:1}}
 </style>
 </head>
 <body>
-  <div id="offlineBanner" class="offline-banner">📡 Network issue</div>
-
   <header class="hero">
     <div class="topbar">
-      <button id="menuBtn" class="hamburger">☰</button>
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div>
@@ -67,19 +155,55 @@
     </div>
   </header>
 
-  <aside id="sidebar" class="sidebar">
-    <h2>Weekly Menu</h2>
-    <div id="weeklyMenu"></div>
-  </aside>
-
   <main class="wrap">
     <section class="grid" id="menuGrid"></section>
   </main>
 
-  <footer class="footer">developed by utkarsh</footer>
-
 <script>
-  const messMenu = { /* … same menu data … */ };
+  const messMenu = {
+    "Monday": {
+      "Breakfast": "Matar + Kulcha + Milk + Tea + Fruit",
+      "Lunch": "Mix Veg with Paneer + Arhar Dal + Roti + Rice + Salad + Lemon 1/2 + Boondi Raita",
+      "Snacks": "Aloo Patties + Tea + Tomato Sauce + Chilli Sauce",
+      "Dinner": "Dal Makhani + Arabi + Roti + Rice + Kheer/Sewai + Onion Salad"
+    },
+    "Tuesday": {
+      "Breakfast": "Plain Paratha + Aloo Tamatar Sabji + Milk + Tea + Fruit",
+      "Lunch": "Aloo Beans + Rajma + Roti + Rice + Salad + Lemon 1/2 + Curd",
+      "Snacks": "Macaroni + Chilli & Tomato Sauce + Shikanji",
+      "Dinner": "Arhar Dal + Bhindi + Roti + Rice + Gulab Jamun + Chhachh"
+    },
+    "Wednesday": {
+      "Breakfast": "Pavbhaji + Butter + Tea + Milk + Pickle + Fruit",
+      "Lunch": "Kadhi + Aloo Pyaj Sabji + Roti + Rice + Salad + Fried Papad + Lemon 1/2",
+      "Snacks": "Poha + Tomato Sauce + Roohafza",
+      "Dinner": "Kala Chana + Mix Veg + Rice + Roti + Custard + Onion Salad"
+    },
+    "Thursday": {
+      "Breakfast": "Aloo Pyaj Paratha + Curd + Pickle + Tea + Fruit",
+      "Lunch": "Lauki + Chana Daal + Roti + Rice + Salad + Veg Raita + Lemon 1/2",
+      "Snacks": "Bread Pakoda + Hari Chutney + Sonth + Tea",
+      "Dinner": "Kadhai Matar Paneer + Aloo Chhole + Roti + Jeera Rice + Onion Salad + Masala Mirch"
+    },
+    "Friday": {
+      "Breakfast": "Aloo Sandwich + Tomato Sauce + Daliya + Tea + Fruit",
+      "Lunch": "Chhole + Kashi Phali + Roti + Jeera Rice + Salad + Curd + Lemon 1/2",
+      "Snacks": "Chaat Papdi/Burger + Tomato & Chilli Sauce + Shikanji",
+      "Dinner": "Hari Moong Dal + Kathal + Rice + Roti + Ice Cream + Onion Salad + Matar Mushroom + Moong Dal Halwa"
+    },
+    "Saturday": {
+      "Breakfast": "Aloo Tamatar Sabji + Ajwain Poori + Curd + Jalebi + Fruit",
+      "Lunch": "Tehri + Roti + Aloo Tomato Sabji + Curd + Salad + Lemon 1/2",
+      "Snacks": "Samosa + Tea + Hari Chutney + Sonth",
+      "Dinner": "Rajma + Aloo Shimla Mirch + Roti + Jeera Rice + Chhachh"
+    },
+    "Sunday": {
+      "Breakfast": "Idli (Plain/Fried) + Sambhar + Coconut Chutney + Tea + Milk + Fruit",
+      "Lunch": "Chhole Bhature + Jeera Rice + Fry Mirch + Sirka Pyaj + Pudina Raita + Achar + Cold Drink",
+      "Snacks": "OFF",
+      "Dinner": "Kali Masoor Dal + Taro + Roti + Suji Halwa/Besan Laddoo + Chhachh"
+    }
+  };
 
   const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const now = new Date();
@@ -92,7 +216,6 @@
   const iconMap = { Breakfast:"🍳", Lunch:"🥗", Snacks:"🍪", Dinner:"🍛" };
   const flagClass = { Breakfast:"breakfast", Lunch:"lunch", Snacks:"snacks", Dinner:"dinner" };
 
-  // today’s menu cards
   Object.entries(todayMenu).forEach(([meal, items]) => {
     const card = document.createElement('article');
     card.className = 'card';
@@ -104,27 +227,11 @@
     grid.appendChild(card);
   });
 
-  // weekly menu in sidebar
-  const weeklyMenu = document.getElementById('weeklyMenu');
-  Object.entries(messMenu).forEach(([day, meals])=>{
-    const section = document.createElement('div');
-    section.innerHTML = `<h3>${day}</h3>`;
-    Object.entries(meals).forEach(([meal, items])=>{
-      section.innerHTML += `<p><strong>${meal}:</strong> ${items}</p>`;
-    });
-    weeklyMenu.appendChild(section);
-  });
-
-  // sidebar toggle
-  document.getElementById('menuBtn').addEventListener('click',()=>{
-    document.getElementById('sidebar').classList.toggle('open');
-  });
-
-  // theme toggle (unchanged)
   const root=document.documentElement;
   const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
   const savedTheme=localStorage.getItem('theme');
   const startDark=savedTheme?(savedTheme==='dark'):prefersDark;
+
   function applyTheme(isDark){
     root.classList.toggle('dark',isDark);
     document.getElementById('darkBtn').classList.toggle('active',isDark);
@@ -133,33 +240,13 @@
     document.getElementById('lightBtn').setAttribute('aria-pressed',String(!isDark));
   }
   applyTheme(startDark);
-  document.getElementById('lightBtn').addEventListener('click',()=>{applyTheme(false);localStorage.setItem('theme','light');});
-  document.getElementById('darkBtn').addEventListener('click',()=>{applyTheme(true);localStorage.setItem('theme','dark');});
 
-  // offline banner
-  const banner = document.getElementById('offlineBanner');
-  function updateOnlineStatus() {
-    banner.style.display = navigator.onLine ? 'none' : 'block';
-  }
-  window.addEventListener('online', updateOnlineStatus);
-  window.addEventListener('offline', updateOnlineStatus);
-  updateOnlineStatus();
-
-  // push notifications
-  if ('serviceWorker' in navigator && 'PushManager' in window) {
-    navigator.serviceWorker.register('service-worker.js').then(swReg=>{
-      console.log("SW registered", swReg);
-
-      // ask permission
-      Notification.requestPermission().then(permission=>{
-        if(permission === "granted"){
-          console.log("Notifications allowed");
-          // TODO: get subscription with VAPID key
-          // swReg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: "<YourPublicVAPIDKeyHere>" })
-        }
-      });
-    });
-  }
+  document.getElementById('lightBtn').addEventListener('click',()=>{
+    applyTheme(false); localStorage.setItem('theme','light');
+  });
+  document.getElementById('darkBtn').addEventListener('click',()=>{
+    applyTheme(true); localStorage.setItem('theme','dark');
+  });
 </script>
 </body>
 </html>
