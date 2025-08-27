@@ -79,52 +79,87 @@
   <footer class="footer">developed by utkarsh</footer>
 
 <script>
+  const messMenu = { /* … same menu data … */ };
+
+  const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const now = new Date();
+  const todayName = dayNames[now.getDay()];
+
+  document.getElementById('dayLabel').textContent = todayName;
+  const grid = document.getElementById('menuGrid');
+  const todayMenu = messMenu[todayName];
+
+  const iconMap = { Breakfast:"🍳", Lunch:"🥗", Snacks:"🍪", Dinner:"🍛" };
+  const flagClass = { Breakfast:"breakfast", Lunch:"lunch", Snacks:"snacks", Dinner:"dinner" };
+
+  // today’s menu cards
+  Object.entries(todayMenu).forEach(([meal, items]) => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="flag ${flagClass[meal]}"></div>
+      <h3>${iconMap[meal]||"🍽️"} ${meal}</h3>
+      <div class="items"><span>${items}</span></div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // weekly menu in sidebar
+  const weeklyMenu = document.getElementById('weeklyMenu');
+  Object.entries(messMenu).forEach(([day, meals])=>{
+    const section = document.createElement('div');
+    section.innerHTML = `<h3>${day}</h3>`;
+    Object.entries(meals).forEach(([meal, items])=>{
+      section.innerHTML += `<p><strong>${meal}:</strong> ${items}</p>`;
+    });
+    weeklyMenu.appendChild(section);
+  });
+
+  // sidebar toggle
+  document.getElementById('menuBtn').addEventListener('click',()=>{
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  // theme toggle (unchanged)
+  const root=document.documentElement;
+  const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const savedTheme=localStorage.getItem('theme');
+  const startDark=savedTheme?(savedTheme==='dark'):prefersDark;
+  function applyTheme(isDark){
+    root.classList.toggle('dark',isDark);
+    document.getElementById('darkBtn').classList.toggle('active',isDark);
+    document.getElementById('lightBtn').classList.toggle('active',!isDark);
+    document.getElementById('darkBtn').setAttribute('aria-pressed',String(isDark));
+    document.getElementById('lightBtn').setAttribute('aria-pressed',String(!isDark));
+  }
+  applyTheme(startDark);
+  document.getElementById('lightBtn').addEventListener('click',()=>{applyTheme(false);localStorage.setItem('theme','light');});
+  document.getElementById('darkBtn').addEventListener('click',()=>{applyTheme(true);localStorage.setItem('theme','dark');});
+
+  // offline banner
+  const banner = document.getElementById('offlineBanner');
+  function updateOnlineStatus() {
+    banner.style.display = navigator.onLine ? 'none' : 'block';
+  }
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  updateOnlineStatus();
+
   // push notifications
   if ('serviceWorker' in navigator && 'PushManager' in window) {
-    navigator.serviceWorker.register('/service-worker.js').then(async (swReg) => {
-      console.log("Service Worker registered:", swReg);
+    navigator.serviceWorker.register('service-worker.js').then(swReg=>{
+      console.log("SW registered", swReg);
 
-      // ask for notification permission
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        console.log("Notifications not allowed by user");
-        return;
-      }
-
-      console.log("Notifications allowed");
-
-      // subscribe with VAPID public key
-      const subscription = await swReg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array("YOUR_PUBLIC_VAPID_KEY_HERE")
-      });
-
-      // send subscription to backend
-      await fetch("http://localhost:4000/subscribe", {
-        method: "POST",
-        body: JSON.stringify(subscription),
-        headers: {
-          "Content-Type": "application/json"
+      // ask permission
+      Notification.requestPermission().then(permission=>{
+        if(permission === "granted"){
+          console.log("Notifications allowed");
+          // TODO: get subscription with VAPID key
+          // swReg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: "<YourPublicVAPIDKeyHere>" })
         }
       });
-
-      console.log("Subscribed and sent to backend:", subscription);
     });
   }
-
-  // helper function for VAPID key conversion
-  function urlBase64ToUint8Array(base64String) {
-    const padding = "=".repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-  }
 </script>
-
 </body>
 </html>
-
